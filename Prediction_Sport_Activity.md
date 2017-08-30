@@ -404,7 +404,6 @@ model1 using decision tree classifier with 10 k-fold
 
 
 
-Decision tree did not lead to high accuraccy results (72.11%)
 
 
 ```
@@ -440,7 +439,9 @@ Decision tree did not lead to high accuraccy results (72.11%)
 ## Detection Prevalence   0.3469   0.1539   0.1902  0.13762   0.1713
 ## Balanced Accuracy      0.8976   0.7601   0.8510  0.77288   0.8585
 ```
+Decision tree did not lead to high accuraccy results (74.09%)
 
+Model2 using random forest classifier.
 
 ```
 ## Confusion Matrix and Statistics

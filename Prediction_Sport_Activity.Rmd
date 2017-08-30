@@ -73,6 +73,7 @@ confusionMatrix(prediction1,validation$classe)
 ```
 Decision tree did not lead to high accuraccy results (74.09%)
 
+Model2 using random forest classifier.
 ```{r model2: Random Forest}
 model2 <- randomForest(classe ~ ., data=training,  ntree=100)
 prediction2 <- predict(model2,validation[ , drop], type="class")
