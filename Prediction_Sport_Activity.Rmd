@@ -63,7 +63,6 @@ inTrain <- createDataPartition(training$classe, p = .6,list=FALSE)
 training <- training[ inTrain,]
 validation <- training[-inTrain,]
 ```
-Decision tree did not lead to high accuraccy results (72.11%)
 
 ```{r model 1: Decision Tree}
 drop <- colnames(training) != "classe"
@@ -72,6 +71,7 @@ model1 <- rpart(classe ~ ., data=training, control = rpart.control(cp = 0.01), m
 prediction1 <- predict(model1,validation[ , drop], type="class")
 confusionMatrix(prediction1,validation$classe)
 ```
+Decision tree did not lead to high accuraccy results (74.09%)
 
 ```{r model2: Random Forest}
 model2 <- randomForest(classe ~ ., data=training,  ntree=100)
