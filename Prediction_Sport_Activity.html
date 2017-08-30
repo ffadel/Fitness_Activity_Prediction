@@ -124,8 +124,8 @@ $(document).ready(function () {
 </div>
 
 
-<div id="sypnoisis" class="section level3">
-<h3>Sypnoisis</h3>
+<div id="sinopsis" class="section level3">
+<h3>Sinopsis</h3>
 <p>Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: <a href="http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har" class="uri">http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har</a> (see the section on the Weight Lifting Exercise Dataset).</p>
 </div>
 <div id="dataset" class="section level3">
@@ -136,14 +136,8 @@ $(document).ready(function () {
 <div id="data-processing" class="section level3">
 <h3>Data Processing</h3>
 <p>The training dataset is split into training and validation sets in order to evaluate the models and measure predictions rate. The testing dataset is unlabeled and used for testing the accuracy ouput from the final model.</p>
-<pre class="r"><code>training &lt;- read.csv(&quot;./pml-training.csv&quot;)#,na.strings=c(&quot;NA&quot;,&quot;#DIV/0!&quot;, &quot;&quot;))
-testing &lt;- read.csv(&quot;./pml-testing.csv&quot;)#, na.strings=c(&quot;NA&quot;,&quot;#DIV/0!&quot;,&quot;&quot;))</code></pre>
-<pre class="r"><code># view dimensions of datasets
-dim(training)</code></pre>
 <pre><code>## [1] 19622   160</code></pre>
-<pre class="r"><code>dim(testing)</code></pre>
 <pre><code>## [1]  20 160</code></pre>
-<pre class="r"><code>head(training)</code></pre>
 <pre><code>##   X user_name raw_timestamp_part_1 raw_timestamp_part_2   cvtd_timestamp
 ## 1 1  carlitos           1323084231               788290 05/12/2011 11:23
 ## 2 2  carlitos           1323084231               808298 05/12/2011 11:23
@@ -424,14 +418,6 @@ dim(training)</code></pre>
 ## 4              -16              658              469      A
 ## 5              -17              655              473      A
 ## 6               -9              660              478      A</code></pre>
-<pre class="r"><code>#exclude columns with NA values
-training &lt;- training[,colSums(is.na(testing)) == 0]
-testing &lt;- testing[,colSums(is.na(testing)) == 0]
-
-#remove the first 7 columns - no valuable information for classifier
-training &lt;- training[,-c(1:7)]
-testing &lt;- testing[,-c(1:7)]
-head(training)</code></pre>
 <pre><code>##   roll_belt pitch_belt yaw_belt total_accel_belt gyros_belt_x gyros_belt_y
 ## 1      1.41       8.07    -94.4                3         0.00         0.00
 ## 2      1.41       8.07    -94.4                3         0.02         0.00
@@ -520,17 +506,7 @@ head(training)</code></pre>
 <div id="models-prediction" class="section level3">
 <h3>Models Prediction</h3>
 <p>model1 using decision tree classifier with 10 k-fold</p>
-<pre class="r"><code>#split training data to training and validation 
-training$classe &lt;- as.factor(training$classe)
-inTrain &lt;- createDataPartition(training$classe, p = .6,list=FALSE)
-training &lt;- training[ inTrain,]
-validation &lt;- training[-inTrain,]</code></pre>
 <p>Decision tree did not lead to high accuraccy results (72.11%)</p>
-<pre class="r"><code>drop &lt;- colnames(training) != &quot;classe&quot;
-train_control &lt;- trainControl(method=&quot;cv&quot;, number=10, savePredictions = TRUE)
-model1 &lt;- rpart(classe ~ ., data=training, control = rpart.control(cp = 0.01), method=&quot;class&quot;)
-prediction1 &lt;- predict(model1,validation[ , drop], type=&quot;class&quot;)
-confusionMatrix(prediction1,validation$classe)</code></pre>
 <pre><code>## Confusion Matrix and Statistics
 ## 
 ##           Reference
@@ -562,9 +538,6 @@ confusionMatrix(prediction1,validation$classe)</code></pre>
 ## Detection Rate         0.2557   0.1145   0.1353  0.09563   0.1397
 ## Detection Prevalence   0.3469   0.1539   0.1902  0.13762   0.1713
 ## Balanced Accuracy      0.8976   0.7601   0.8510  0.77288   0.8585</code></pre>
-<pre class="r"><code>model2 &lt;- randomForest(classe ~ ., data=training,  ntree=100)
-prediction2 &lt;- predict(model2,validation[ , drop], type=&quot;class&quot;)
-confusionMatrix(prediction2,validation$classe)</code></pre>
 <pre><code>## Confusion Matrix and Statistics
 ## 
 ##           Reference
@@ -601,10 +574,6 @@ confusionMatrix(prediction2,validation$classe)</code></pre>
 <div id="predicting-classe-for-testing-set-20-cases" class="section level3">
 <h3>Predicting classe for testing set (20 cases)</h3>
 <p>Using model2 (randomForest model) to predict the classe of the tesing set</p>
-<pre class="r"><code>#Prediction of class
-predresult2 &lt;- predict(model2,testing[ , drop], type=&quot;class&quot;)
-#results
-predresult2</code></pre>
 <pre><code>##  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 
 ##  B  A  B  A  A  E  D  B  A  A  B  C  B  A  E  E  A  B  B  B 
 ## Levels: A B C D E</code></pre>
