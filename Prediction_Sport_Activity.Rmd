@@ -1,0 +1,90 @@
+---
+title: "Fitness Activity Prediction"
+author: "FFadel"
+date: "August 28, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(caret)
+library(rpart)
+library(rpart.plot)
+library(randomForest)
+```
+
+### Sypnoisis
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset).
+
+
+### Dataset
+The training data for this project are available from [https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv)
+
+The test data are available [https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv)
+
+### Data Processing
+
+The training dataset is split into training and validation sets in order to evaluate the models and measure predictions rate.
+The testing dataset is unlabeled and used for testing the accuracy ouput from the final model.
+
+```{r data processing}
+training <- read.csv("./pml-training.csv")#,na.strings=c("NA","#DIV/0!", ""))
+testing <- read.csv("./pml-testing.csv")#, na.strings=c("NA","#DIV/0!",""))
+```
+
+```{r analysis}
+# view dimensions of datasets
+dim(training)
+dim(testing)
+head(training)
+
+#exclude columns with NA values
+training <- training[,colSums(is.na(testing)) == 0]
+testing <- testing[,colSums(is.na(testing)) == 0]
+
+#remove the first 7 columns - no valuable information for classifier
+training <- training[,-c(1:7)]
+testing <- testing[,-c(1:7)]
+head(training)
+```
+
+### Models Prediction
+model1 using decision tree classifier with 10 k-fold 
+```{r seed, echo=FALSE}
+set.seed(1234568)
+```
+
+```{r prediction decision tree}
+#split training data to training and validation 
+training$classe <- as.factor(training$classe)
+inTrain <- createDataPartition(training$classe, p = .6,list=FALSE)
+training <- training[ inTrain,]
+validation <- training[-inTrain,]
+```
+Decision tree did not lead to high accuraccy results (72.11%)
+
+```{r model 1: Decision Tree}
+drop <- colnames(training) != "classe"
+train_control <- trainControl(method="cv", number=10, savePredictions = TRUE)
+model1 <- rpart(classe ~ ., data=training, control = rpart.control(cp = 0.01), method="class")
+prediction1 <- predict(model1,validation[ , drop], type="class")
+confusionMatrix(prediction1,validation$classe)
+```
+
+```{r model2: Random Forest}
+model2 <- randomForest(classe ~ ., data=training,  ntree=100)
+prediction2 <- predict(model2,validation[ , drop], type="class")
+confusionMatrix(prediction2,validation$classe)
+```
+Random Forest model did accomplish high accuracy (100%).
+
+### Predicting classe for testing set (20 cases)
+Using model2 (randomForest model) to predict the classe of the tesing set
+
+```{r test class prediction}
+#Prediction of class
+predresult2 <- predict(model2,testing[ , drop], type="class")
+#results
+predresult2
+
+```
