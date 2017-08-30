@@ -30,8 +30,8 @@ The training dataset is split into training and validation sets in order to eval
 The testing dataset is unlabeled and used for testing the accuracy ouput from the final model.
 
 ```{r data processing}
-training <- read.csv("./pml-training.csv")#,na.strings=c("NA","#DIV/0!", ""))
-testing <- read.csv("./pml-testing.csv")#, na.strings=c("NA","#DIV/0!",""))
+training <- read.csv("./pml-training.csv")
+testing <- read.csv("./pml-testing.csv")
 ```
 
 ```{r analysis}
